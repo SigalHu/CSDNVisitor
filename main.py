@@ -2,6 +2,8 @@ import urllib.request
 import urllib.parse
 from bs4 import BeautifulSoup
 import datetime
+import random
+import time
 
 class CSDNVisitor:
 	__blog_list = []
@@ -15,7 +17,7 @@ class CSDNVisitor:
 	def blog_probability(self):
 		return self.__blog_probability
 
-	def __init__(self,blog_list_url):
+	def __init__(self,blog_list_url,date_weight=1,hits_weight=1):
 		month_dict = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': '9', '十': 10, '十一': 11,
 		              '十二': 12}
 		url_info = urllib.parse.urlsplit(blog_list_url)
@@ -50,8 +52,9 @@ class CSDNVisitor:
 				break
 			blog_list_url = urllib.parse.urlunsplit(
 				(url_info.scheme, url_info.netloc, url_tag['href'], url_info.query, url_info.fragment))
+		self.__calculate_probability(date_weight,hits_weight)
 
-	def calculate_probability(self,date_weight,hits_weight):
+	def __calculate_probability(self,date_weight=1,hits_weight=1):
 		weight = date_weight + hits_weight
 		date_weight /= weight
 		hits_weight /= weight
@@ -87,15 +90,24 @@ class CSDNVisitor:
 				return ii
 		return len(self.__blog_probability)-1
 
+	def start_visit(self,visit_num=10,min_sleep_time=1,max_sleep_time=10):
+		if max_sleep_time < min_sleep_time:
+			raise Exception('等待时间范围设置错误！')
+		for ii in range(visit_num):
+			idx = self.__get_blog_index(random.random())
+			print('已访问 %d/%d 次，此次访问《%s》！' % (ii+1,visit_num,self.__blog_list[idx]['标题']))
+			try:
+				urllib.request.urlopen(self.__blog_list[idx]['链接'])
+				time.sleep(random.uniform(min_sleep_time,max_sleep_time))
+			except Exception as ex:
+				print(ex)
+		print('访问完成！')
+
+
 def __main():
 	url = r'http://blog.csdn.net/u011475134'
 	csdn_visitor = CSDNVisitor(url)
-	csdn_visitor.calculate_probability(10,10)
-	total = 0
-	for blog in csdn_visitor.blog_probability:
-		total += blog
-		print(blog)
-	print(total)
+	csdn_visitor.start_visit(1000,0.1,0.1)
 
 if __name__ == '__main__':
 	__main()
