@@ -176,7 +176,21 @@ class CSDNVisitor:
 		for thread in thread_task:
 			thread.join()
 
+	@staticmethod
+	def start_visit_article(article_url, visit_num=10, min_sleep_time=1, max_sleep_time=10):
+		if max_sleep_time < min_sleep_time:
+			raise Exception('等待时间范围设置错误！')
+		for ii in range(visit_num):
+			print('已访问 %d/%d 次！' % (ii + 1, visit_num))
+			try:
+				urllib.request.urlopen(article_url)
+				time.sleep(random.uniform(min_sleep_time, max_sleep_time))
+			except Exception as ex:
+				print(ex)
+		print('访问完成！')
+
 def __main():
+	# CSDNVisitor.start_visit_article(r'http://blog.csdn.net/u000000000/article/details/00000000')
 	url = r'http://blog.csdn.net/u000000000'
 	csdn_visitor = CSDNVisitor(url)
 	csdn_visitor.start_visit_plus()
