@@ -177,9 +177,9 @@ class CSDNVisitor:
 			thread.join()
 
 def __main():
-	url = r'http://blog.csdn.net/u011475134'
+	url = r'http://blog.csdn.net/u000000000'
 	csdn_visitor = CSDNVisitor(url)
-	csdn_visitor.start_visit(100000)
+	csdn_visitor.start_visit_plus()
 
 
 if __name__ == '__main__':
